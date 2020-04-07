@@ -1,0 +1,11 @@
+{
+  "minVersion": "0.8",
+  "package": "net.jay113355.ipforward.mixin",
+  "refmap": "mixins.ipforward.refmap.json",
+  "verbose": true,
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinFMLCommonHandler",
+    "MixinNetHandlerLoginServer"
+  ]
+}
