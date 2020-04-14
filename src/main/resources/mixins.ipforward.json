@@ -5,6 +5,7 @@
   "verbose": true,
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinC00Handshake",
     "MixinFMLCommonHandler",
     "MixinNetHandlerLoginServer"
   ]
