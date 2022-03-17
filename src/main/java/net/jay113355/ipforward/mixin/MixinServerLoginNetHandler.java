@@ -21,12 +21,11 @@ import com.mojang.authlib.GameProfile;
 import net.jay113355.ipforward.IpForwardConfig;
 import net.jay113355.ipforward.ProxyData;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.login.INetHandlerLoginServer;
-import net.minecraft.network.login.client.CPacketLoginStart;
-import net.minecraft.network.login.server.SPacketDisconnect;
-import net.minecraft.server.network.NetHandlerLoginServer;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.network.login.IServerLoginNetHandler;
+import net.minecraft.network.login.ServerLoginNetHandler;
+import net.minecraft.network.login.client.CLoginStartPacket;
+import net.minecraft.network.login.server.SDisconnectLoginPacket;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,34 +38,34 @@ import java.net.SocketAddress;
 /**
  * Created by Jay113355 on 4/3/2020.
  */
-@Mixin(NetHandlerLoginServer.class)
-public abstract class MixinNetHandlerLoginServer implements INetHandlerLoginServer, ITickable {
+@Mixin(ServerLoginNetHandler.class)
+public abstract class MixinServerLoginNetHandler implements IServerLoginNetHandler {
 	@Final
 	@Shadow
-	public NetworkManager networkManager;
+	public NetworkManager connection;
 	@Shadow
-	private GameProfile loginGameProfile;
+	private GameProfile gameProfile;
 	@Shadow
-	private NetHandlerLoginServer.LoginState currentLoginState;
+	private ServerLoginNetHandler.State state;
 
-	@Inject(method = "processLoginStart(Lnet/minecraft/network/login/client/CPacketLoginStart;)V", cancellable = true,
-			at = @At(value = "FIELD", target = "Lnet/minecraft/server/network/NetHandlerLoginServer;loginGameProfile:Lcom/mojang/authlib/GameProfile;", opcode = 181, shift = At.Shift.AFTER))
-	private void onProcessLoginStart(CPacketLoginStart packetIn, CallbackInfo ci) {
+	@Inject(method = "handleHello(Lnet/minecraft/network/login/client/CLoginStartPacket;)V", cancellable = true,
+			at = @At(value = "FIELD", target = "Lnet/minecraft/network/login/ServerLoginNetHandler;gameProfile:Lcom/mojang/authlib/GameProfile;", opcode = 181, shift = At.Shift.AFTER))
+	private void onProcessLoginStart(CLoginStartPacket packetIn, CallbackInfo ci) {
 		// TARGET = AFTER PUTFIELD net/minecraft/server/network/NetHandlerLoginServer.loginGameProfile : Lcom/mojang/authlib/GameProfile;
-		// this.loginGameProfile = packetIn.getProfile();
-		String realAddress = addressToString(this.networkManager.channel().remoteAddress());
+		// this.gameProfile = pPacket.getGameProfile();
+		String realAddress = addressToString(this.connection.channel().remoteAddress());
 		if (IpForwardConfig.INSTANCE.isProxyAddress(realAddress) &&
-				this.networkManager.channel().attr(ProxyData.PROXY_KEY).get() != null) {
-			ProxyData data = this.networkManager.channel().attr(ProxyData.PROXY_KEY).get();
-			this.loginGameProfile = data.newProfile(packetIn.getProfile());
-			this.currentLoginState = net.minecraft.server.network.NetHandlerLoginServer.LoginState.READY_TO_ACCEPT;
+				this.connection.channel().attr(ProxyData.PROXY_KEY).get() != null) {
+			ProxyData data = this.connection.channel().attr(ProxyData.PROXY_KEY).get();
+			this.gameProfile = data.newProfile(packetIn.getGameProfile());
+			this.state = ServerLoginNetHandler.State.READY_TO_ACCEPT;
 			ci.cancel();
 		} else if (IpForwardConfig.INSTANCE.blockNonProxyConnections()) {
 			IpForwardConfig.LOGGER.info("Disconnecting non proxy connection from: " + realAddress);
-			this.networkManager.sendPacket(new SPacketDisconnect(new TextComponentTranslation("disconnect.disconnected")));
+			this.connection.send(new SDisconnectLoginPacket(new TranslationTextComponent("disconnect.disconnected")));
 			ci.cancel();
 		}
-		// if (this.server.isServerInOnlineMode() && !this.networkManager.isLocalChannel())
+		// if (this.server.usesAuthentication() && !this.connection.isMemoryConnection()) {
 	}
 
 	private static String addressToString(SocketAddress address) {

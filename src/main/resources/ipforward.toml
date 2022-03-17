@@ -1,0 +1,10 @@
+[general]
+# A list of proxy ip addresses.
+# If a address is not in this list and blockNonProxyConnections is false then the normal authentication process will take place, allowing for direct connections.
+# If this list is empty it will accept any connections with ip-forward data. However that is not recommended as it leaves your server vulnerable to fake proxy attacks.
+# Only leave this blank if you intend on migrating attacks via firewall or some other join protection system.
+proxyAddresses = [ "127.0.0.1" ]
+# Whether or not to block connections that are not made though a proxy
+# If this is false: users may join directly to this server and they will be authenticated according to the online-mode set in the server.properties
+# If this is true: Users joining directly and/or any connections not in the proxyAddresses list will be disconnected.
+blockNonProxyConnections = true

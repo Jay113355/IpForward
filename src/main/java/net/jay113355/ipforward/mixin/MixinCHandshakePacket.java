@@ -18,7 +18,7 @@
 package net.jay113355.ipforward.mixin;
 
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.handshake.client.C00Handshake;
+import net.minecraft.network.handshake.client.CHandshakePacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -29,15 +29,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Created by Jay113355 on 4/14/2020.
  */
-@Mixin(C00Handshake.class)
-public class MixinC00Handshake {
+@Mixin(CHandshakePacket.class)
+public class MixinCHandshakePacket {
 
 	/**
 	 * Changes the maxLength value passed to readString() on the ip field.
-	 *
+	 * <p>
 	 * This is so we can collect all the data sent by bungee/velocity
 	 */
-	@ModifyConstant(method = "readPacketData(Lnet/minecraft/network/PacketBuffer;)V",
+	@ModifyConstant(method = "read(Lnet/minecraft/network/PacketBuffer;)V",
 			constant = @Constant(intValue = 255))
 	private int onReadPacketData(int value) {
 		return 65536;// 64KiB
@@ -46,8 +46,8 @@ public class MixinC00Handshake {
 	/**
 	 * Road blocks the string split call forge adds which wipes out the data from the proxy.
 	 */
-	@Inject(method = "readPacketData(Lnet/minecraft/network/PacketBuffer;)V", cancellable = true,
-			at = @At(value = "FIELD", target = "Lnet/minecraft/network/handshake/client/C00Handshake;hasFMLMarker:Z", opcode = 181, shift = At.Shift.AFTER))
+	@Inject(method = "read(Lnet/minecraft/network/PacketBuffer;)V", cancellable = true,
+			at = @At(value = "FIELD", target = "Lnet/minecraft/network/handshake/client/CHandshakePacket;fmlVersion:Ljava/lang/String;", opcode = 181, shift = At.Shift.AFTER))
 	private void onReadPacketData(PacketBuffer buf, CallbackInfo ci) {
 		ci.cancel();
 	}
