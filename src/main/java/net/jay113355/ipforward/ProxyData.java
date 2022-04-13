@@ -22,6 +22,7 @@ import com.google.gson.GsonBuilder;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
 import io.netty.util.AttributeKey;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
 
 import java.net.SocketAddress;
 import java.util.UUID;
@@ -57,7 +58,7 @@ public class ProxyData {
 
 	public boolean hasFMLMarker() {
 		return properties.containsKey("forgeClient") && properties.get("forgeClient")
-				.stream().findFirst().get().getValue().equalsIgnoreCase("true");
+				.stream().findFirst().get().getValue().equalsIgnoreCase(FMLNetworkConstants.NETVERSION);
 	}
 
 	public GameProfile newProfile(GameProfile gameProfile) {
