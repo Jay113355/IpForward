@@ -54,7 +54,7 @@ public abstract class MixinServerHandshakeNetHandler {
 			String gameProfileProp = elements[3]; // Game profile properties (texture usually)
 			ProxyData data = new ProxyData(new InetSocketAddress(ip, 0), UUIDTypeAdapter.fromString(uuid), gameProfileProp);
 
-			boolean hasFML = data.hasFMLMarker() || Objects.equals(packet.getFMLVersion(), FMLNetworkConstants.NOVERSION);
+			boolean hasFML = data.hasFMLMarker() || Objects.equals(packet.getFMLVersion(), FMLNetworkConstants.NETVERSION);
 			//manager.channel().attr(NetworkRegistry.FML_MARKER).set(hasFML);
 			connection.channel().attr(ProxyData.PROXY_KEY).set(data);
 			connection.address = data.getRemoteAddress();
