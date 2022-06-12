@@ -17,9 +17,10 @@
 
 package net.jay113355.ipforward;
 
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,8 +31,12 @@ import org.apache.logging.log4j.Logger;
 public class IpForward {
 	public static Logger LOGGER = LogManager.getLogger("IpForward");
 
+	public IpForward() {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
+
 	@SubscribeEvent
-	public void onInti(FMLServerStartingEvent event) {
+	public void onServerStart(FMLServerAboutToStartEvent event) {
 		LOGGER.info("Loading IpForward config");
 		IpForwardConfig.INSTANCE.loadConfig();
 	}
