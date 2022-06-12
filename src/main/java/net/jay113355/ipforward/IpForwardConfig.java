@@ -37,14 +37,15 @@ public class IpForwardConfig {
 
 	public IpForwardConfig loadConfig() {
 		FileConfig config = FileConfig.builder(configFile)
-				.defaultResource("ipforward.toml")
+				.defaultData(IpForwardConfig.class.getResource("/ipforward.toml"))
 				.charset(StandardCharsets.UTF_8)
 				.build();
-
+		config.load();
 		List<String> addresses = config.get("general.proxyAddresses");
 		proxyAddresses.clear();
 		proxyAddresses.addAll(addresses);
 		blockNonProxyConnections = config.get("general.blockNonProxyConnections");
+		config.save();
 		return this;
 	}
 
