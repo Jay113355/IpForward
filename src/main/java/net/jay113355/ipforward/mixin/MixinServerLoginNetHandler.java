@@ -58,7 +58,7 @@ public abstract class MixinServerLoginNetHandler implements IServerLoginNetHandl
 				this.connection.channel().attr(ProxyData.PROXY_KEY).get() != null) {
 			ProxyData data = this.connection.channel().attr(ProxyData.PROXY_KEY).get();
 			this.gameProfile = data.newProfile(packetIn.getGameProfile());
-			this.state = ServerLoginNetHandler.State.READY_TO_ACCEPT;
+			this.state = ServerLoginNetHandler.State.NEGOTIATING;
 			ci.cancel();
 		} else if (IpForwardConfig.INSTANCE.blockNonProxyConnections()) {
 			IpForwardConfig.LOGGER.info("Disconnecting non proxy connection from: " + realAddress);
