@@ -1,4 +1,5 @@
-I've archived this project as I no longer use it as it can be replaced by https://github.com/caunt/BungeeForge with higher minecraft version support.
+I've archived this project as I no longer use it. 
+It can be replaced by https://github.com/caunt/BungeeForge with higher minecraft version support.
 
 # IPForward
 This is a [MinecraftForge](https://minecraftforge.net) (core)mod that uses [Mixins](https://github.com/SpongePowered/Mixin) to add IP forwarding capabilities to forge.
